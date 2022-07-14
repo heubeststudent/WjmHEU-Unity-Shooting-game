@@ -1,0 +1,185 @@
+    using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+
+public class PoolManager : MonoBehaviour
+{
+    [SerializeField] Pool[] enemyPools;//声明一个敌人的池数组
+
+    [SerializeField]Pool[] playerProjectilePools;//声明一个玩家子弹的池数组
+
+    [SerializeField] Pool[] enemyProjectilePools;//声明一个敌人子弹的池数组
+
+    [SerializeField] Pool[] vFXPools;//特效对象池数组
+
+    static Dictionary<GameObject, Pool> dictionary;//字典使用静态
+
+    void Awake()
+    {
+        dictionary = new Dictionary<GameObject, Pool>();
+        Initalize(enemyPools);
+        Initalize(playerProjectilePools);
+        Initalize(enemyProjectilePools);
+        Initalize(vFXPools);
+    }
+
+    #if UNITY_EDITOR
+    void OnDestroy()
+    {
+        CheckPoolSize(enemyPools);
+        CheckPoolSize(playerProjectilePools);
+        CheckPoolSize(enemyProjectilePools);
+        CheckPoolSize(vFXPools);
+    }
+    #endif
+    void CheckPoolSize(Pool[] pools)
+    {
+        foreach (var pool in pools)
+        {
+            if(pool.RuntimeSize>pool.Size)
+            {
+                //Debug.LogWarning(string.Format("Pool: {0} has a runtime size {1} bigger than its initial size {2}!",
+                //    pool.Prefab.name,
+                //    pool.RuntimeSize,
+                //    pool.Size));
+            }
+        }
+    }
+    void Initalize(Pool[] pools)
+    {
+        //遍历pool数组
+        foreach(var pool in pools)
+        {
+#if UNITY_EDITOR
+            if (dictionary.ContainsKey(pool.Prefab))
+            {
+                Debug.LogError("Same prefab in multiple pools! Prefab: " + pool.Prefab.name);
+
+                continue;
+            }
+#endif
+            dictionary.Add(pool.Prefab, pool);
+
+            Transform poolparent =  new GameObject("Pool: " +pool.Prefab.name).transform;
+
+            poolparent.parent = transform;
+            pool.Initalize(poolparent);
+        }
+    }
+
+    /// <summary>
+    /// <para>Release a specified prepared gameObject in the pool at specified position.</para>
+    /// <para>根据传入的prefab参数，在position参数位置释放对象池中预备好的游戏对象。</para> 
+    /// </summary>
+    /// <param name="prefab">
+    /// <para>Specified gameObject prefab.</para>
+    /// <para>指定的游戏对象预制体。</para>
+    /// </param>
+    /// <param name="position">
+    /// <para>Specified release position.</para>
+    /// <para>指定释放位置。</para>
+    /// </param>
+    /// <returns></returns>
+    public static GameObject Release(GameObject prefab)
+    {
+#if UNITY_EDITOR
+        if (!dictionary.ContainsKey(prefab))
+        {
+            Debug.LogError("Pool Manager could NOT find prefab: " + prefab.name);
+            return null;
+        }
+#endif
+        return dictionary[prefab].PrepareObject();
+    }
+
+    /// <summary>
+    /// <para>Release a specified prepared gameObject in the pool at specified position.</para>
+    /// <para>根据传入的prefab参数，在position参数位置释放对象池中预备好的游戏对象。</para> 
+    /// </summary>
+    /// <param name="prefab">
+    /// <para>Specified gameObject prefab.</para>
+    /// <para>指定的游戏对象预制体。</para>
+    /// </param>
+    /// <param name="position">
+    /// <para>Specified release position.</para>
+    /// <para>指定释放位置。</para>
+    /// </param>
+    /// <returns></returns>
+    /// 
+    public static GameObject Release(GameObject prefab,Vector3 position)
+    {
+#if UNITY_EDITOR
+        if (!dictionary.ContainsKey(prefab))
+        {
+            Debug.LogError("Pool Manager could NOT find prefab: " + prefab.name);
+            return null;
+        }
+#endif
+        return dictionary[prefab].PrepareObject(position);
+    }
+
+    /// <summary>
+    /// <para>Release a specified prepared gameObject in the pool at specified position and rotation.</para>
+    /// <para>根据传入的prefab参数和rotation参数，在position参数位置释放对象池中预备好的游戏对象。</para> 
+    /// </summary>
+    /// <param name="prefab">
+    /// <para>Specified gameObject prefab.</para>
+    /// <para>指定的游戏对象预制体。</para>
+    /// </param>
+    /// <param name="position">
+    /// <para>Specified release position.</para>
+    /// <para>指定释放位置。</para>
+    /// </param>
+    /// <param name="rotation">
+    /// <para>Specified rotation.</para>
+    /// <para>指定的旋转值。</para>
+    /// </param>
+    /// <returns></returns>
+    public static GameObject Release(GameObject prefab,Vector3 position, Quaternion roation)
+    {
+#if UNITY_EDITOR
+        if (!dictionary.ContainsKey(prefab))
+        {
+            Debug.LogError("Pool Manager could NOT find prefab: " + prefab.name);
+            return null;
+        }
+#endif
+        return dictionary[prefab].PrepareObject(position, roation);
+    }
+
+    /// <summary>
+    /// <para>Release a specified prepared gameObject in the pool at specified position, rotation and scale.</para>
+    /// <para>根据传入的prefab参数, rotation参数和localScale参数，在position参数位置释放对象池中预备好的游戏对象。</para> 
+    /// </summary>
+    /// <param name="prefab">
+    /// <para>Specified gameObject prefab.</para>
+    /// <para>指定的游戏对象预制体。</para>
+    /// </param>
+    /// <param name="position">
+    /// <para>Specified release position.</para>
+    /// <para>指定释放位置。</para>
+    /// </param>
+    /// <param name="rotation">
+    /// <para>Specified rotation.</para>
+    /// <para>指定的旋转值。</para>
+    /// </param>
+    /// <param name="localScale">
+    /// <para>Specified scale.</para>
+    /// <para>指定的缩放值。</para>
+    /// </param>
+    /// <returns></returns>
+    public static GameObject Release(GameObject prefab,Vector3 position, Quaternion roation, Vector3 localScale)
+    {
+#if UNITY_EDITOR
+        if (!dictionary.ContainsKey(prefab))
+        {
+            Debug.LogError("Pool Manager could NOT find prefab: " + prefab.name);
+            return null;
+        }
+#endif
+        return dictionary[prefab].PrepareObject(position, roation, localScale);
+    }
+
+}
