@@ -18,7 +18,7 @@
 ```
 
 ```bash
-本项目采用Unity进行开发支持pc-windows，与安卓两种平台，开发语言采用c#，开发IDE采用VS2022
+本项目采用Unity进行开发支持pc-windows，与安卓两种平台，开发语言采用c#，开发IDE采用VS2022，Unity2021.3进行开发
 ```
 
 
